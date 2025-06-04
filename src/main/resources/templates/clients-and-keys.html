@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Clients and Keys</title>
     <style>
+        table {
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 5px;
+        }
         .green-row {
             background-color: lightgreen;
         }
@@ -19,7 +25,7 @@
 
 <h1>Published keys</h1>
 <p>Current time: <span id="currentTime"></span></p>
-<table border="1" cellpadding="5" cellspacing="0">
+<table>
     <thead>
     <tr>
         <th>#</th>
@@ -30,22 +36,19 @@
         <th>Expires</th>
     </tr>
     </thead>
-    <tbody id="publishedKeys">
-    <!-- Rows will be dynamically updated -->
-    </tbody>
+    <tbody id="publishedKeys" />
 </table>
-<!-- Add here input field with length 40chars button that calls backend and generates new client with the id of the text in input
-It should be post with empty body, but clientId as request parameter -->
+
 <p>
-<form th:action="@{/public/generate}" method="post">
-    <label for="clientId">Generate new client with ID:</label>
-    <input type="text" id="clientId" name="clientId" maxlength="40" required>
-    <button type="submit">Generate</button>
-</form>
+    <form th:action="@{/public/generate}" method="post">
+        <label for="clientId">Generate new client with ID:</label>
+        <input type="text" id="clientId" name="clientId" maxlength="40" required />
+        <button type="submit">Generate</button>
+    </form>
 </p>
 
 <h1>Unpublished keys</h1>
-<table border="1" cellpadding="5" cellspacing="0">
+<table>
     <thead>
     <tr>
         <th>#</th>
@@ -56,9 +59,7 @@ It should be post with empty body, but clientId as request parameter -->
         <th>Expires</th>
     </tr>
     </thead>
-    <tbody id="unpublishedKeys">
-    <!-- Rows will be dynamically updated -->
-    </tbody>
+    <tbody id="unpublishedKeys" />
 </table>
 
     <script>
