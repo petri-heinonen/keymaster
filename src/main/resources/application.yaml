@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: KeyMaster
+  profiles:
+    active: dev
+  jackson:
+    time-zone: 'UTC'
+    date-format: "yyyyMMdd'T'HHmmssX"
+server:
+  port: 8100
+  error:
+    path: '/error'
+    whitelabel:
+      enabled: false

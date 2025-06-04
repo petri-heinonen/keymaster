@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Clients and Keys</title>
+    <style>
+        .green-row {
+            background-color: lightgreen;
+        }
+        .red-row {
+            background-color: lightsalmon;
+        }
+    </style>
+</head>
+<body>
+<p>
+    <button id="clearKeysButton" onclick="clearAllKeys()">Reset</button>
+    <button id="togglePollingButton" onclick="togglePolling()">Stop Polling</button>
+</p>
+
+<h1>Published keys</h1>
+<p>Current time: <span id="currentTime"></span></p>
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Client ID</th>
+        <th>Signature Key</th>
+        <th>Encryption Key</th>
+        <th>Created</th>
+        <th>Expires</th>
+    </tr>
+    </thead>
+    <tbody id="publishedKeys">
+    <!-- Rows will be dynamically updated -->
+    </tbody>
+</table>
+<!-- Add here input field with length 40chars button that calls backend and generates new client with the id of the text in input
+It should be post with empty body, but clientId as request parameter -->
+<p>
+<form th:action="@{/public/generate}" method="post">
+    <label for="clientId">Generate new client with ID:</label>
+    <input type="text" id="clientId" name="clientId" maxlength="40" required>
+    <button type="submit">Generate</button>
+</form>
+</p>
+
+<h1>Unpublished keys</h1>
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Client ID</th>
+        <th>Signature Key</th>
+        <th>Encryption Key</th>
+        <th>Created</th>
+        <th>Expires</th>
+    </tr>
+    </thead>
+    <tbody id="unpublishedKeys">
+    <!-- Rows will be dynamically updated -->
+    </tbody>
+</table>
+
+    <script>
+        function updateCurrentTime() {
+            const now = new Date();
+            const formattedTime = now.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('currentTime').textContent = formattedTime;
+        }
+
+        setInterval(updateCurrentTime, 1000);
+
+        function updateBodySection() {
+            // Fetch updated data from the server
+            fetch('/public/clients-and-keys')
+                .then(response => response.json())
+                .then(data => {
+                    // Update published keys
+                    const publishedKeys = document.getElementById('publishedKeys');
+                    publishedKeys.innerHTML = '';
+                    const now = new Date();
+
+                    data.current.forEach((client, index) => {
+                        const [day, month, year, time] = client.expires.split(/\.| /);
+                        const [hours, minutes, seconds] = time.split(':');
+                        const expiresDate = new Date(year, month - 1, day, hours, minutes, (seconds + 1));
+                        const row = `<tr class="${expiresDate > now ? 'green-row' : 'red-row'}">
+                        <td>${index + 1}</td>
+                        <td>${client.clientId}</td>
+                        <td>${client.signatureKey}</td>
+                        <td>${client.encryptionKey}</td>
+                        <td>${client.created}</td>
+                        <td>${client.expires}</td>
+                    </tr>`;
+                        publishedKeys.innerHTML += row;
+                    });
+
+                    // Update unpublished keys
+                    const unpublishedKeys = document.getElementById('unpublishedKeys');
+                    unpublishedKeys.innerHTML = '';
+                    data.unpublished.forEach((client, index) => {
+                        const [day, month, year, time] = client.expires.split(/\.| /);
+                        const [hours, minutes, seconds] = time.split(':');
+                        const expiresDate = new Date(year, month - 1, day, hours, minutes, seconds);
+                        const row = `<tr class="${expiresDate > now ? 'green-row' : 'red-row'}">
+                        <td>${index + 1}</td>
+                        <td>${client.clientId}</td>
+                        <td>${client.signatureKey}</td>
+                        <td>${client.encryptionKey}</td>
+                        <td>${client.created}</td>
+                        <td>${client.expires}</td>
+                    </tr>`;
+                        unpublishedKeys.innerHTML += row;
+                    });
+                });
+        }
+        let polling = true;
+        let pollingInterval;
+
+        function clearAllKeys() {
+            fetch('/public/clear-keys', { method: 'POST' });
+        }
+
+        function togglePolling() {
+            polling = !polling;
+            const button = document.getElementById('togglePollingButton');
+            if (polling) {
+                button.textContent = 'Stop Polling';
+                pollingInterval = setInterval(updateBodySection, 1000);
+            } else {
+                button.textContent = 'Start Polling';
+                clearInterval(pollingInterval);
+            }
+        }
+
+        // Start polling by default
+        pollingInterval = setInterval(updateBodySection, 1000);
+
+        // Call updateBodySection immediately after the page loads
+        updateBodySection();
+    </script>
+</body>
+</html>

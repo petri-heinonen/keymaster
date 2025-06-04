@@ -1,0 +1,11 @@
+settings:
+  contact:
+    name: 'Petri Heinonen'
+    email: 'petri.heinonen@me.com'
+  vault:
+    key:
+      algorithm: 'RSA'
+      size: 2048 # in bits
+      lifetime: 40 # in seconds
+      create-before: 10 # in seconds
+      rotate-before: 5 # in seconds

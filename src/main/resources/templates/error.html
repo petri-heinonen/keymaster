@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<style>
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 16px;
+    }
+</style>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+
+<body>
+<h1>Something went wrong!</h1>
+<p>
+    Status: <span th:text="${status}"></span>
+</p>
+<p>
+    Error: <span th:text="${error}"></span>
+</p>
+<p>
+    <a href="/">Go Home</a>
+</p>
+</body>
+
+</html>
