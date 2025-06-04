@@ -8,7 +8,6 @@ import fi.pmh.keymaster.domain.Client;
 import fi.pmh.keymaster.service.JWKSetService;
 import fi.pmh.keymaster.service.KeyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,9 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,9 +30,6 @@ public class PublicController {
 
     @Autowired
     private KeyService keyService;
-
-    private SseEmitter emitter;
-    private boolean emitterCompleted = false;
 
     @GetMapping("/signed-jwks/{clientId}")
     public ResponseEntity<String> getSignedJwks(@PathVariable String clientId, @RequestParam(required = false) boolean all) throws JsonProcessingException {
