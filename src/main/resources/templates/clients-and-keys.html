@@ -66,14 +66,16 @@
     <script>
         function updateCurrentTime() {
             const now = new Date();
-            const formattedTime = now.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('currentTime').textContent = formattedTime;
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('fi-FI', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
         }
 
         setInterval(updateCurrentTime, 1000);
 
         function updateBodySection() {
-            // Fetch updated data from the server
             fetch('/public/clients-and-keys')
                 .then(response => response.json())
                 .then(data => {
@@ -83,7 +85,7 @@
                     const now = new Date();
 
                     data.current.forEach((client, index) => {
-                        const [day, month, year, time] = client.expires.split(/\.| /);
+                        const [day, month, year, time] = client.expires.split(/[. ]/);
                         const [hours, minutes, seconds] = time.split(':');
                         const expiresDate = new Date(year, month - 1, day, hours, minutes, (seconds + 1));
                         const row = `<tr class="${expiresDate > now ? 'green-row' : 'red-row'}">
@@ -101,7 +103,7 @@
                     const unpublishedKeys = document.getElementById('unpublishedKeys');
                     unpublishedKeys.innerHTML = '';
                     data.unpublished.forEach((client, index) => {
-                        const [day, month, year, time] = client.expires.split(/\.| /);
+                        const [day, month, year, time] = client.expires.split(/[. ]/);
                         const [hours, minutes, seconds] = time.split(':');
                         const expiresDate = new Date(year, month - 1, day, hours, minutes, seconds);
                         const row = `<tr class="${expiresDate > now ? 'green-row' : 'red-row'}">
