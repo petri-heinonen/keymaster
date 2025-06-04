@@ -51,11 +51,6 @@ public class KeyServiceImpl implements KeyService {
     }
 
     @Override
-    public List<Key> getAllKeys() {
-        return keyRepository.findAllByOrderByClientIdAscCreatedAtDesc();
-    }
-
-    @Override
     public List<String> getClientIds() {
         return keyRepository.findAllClients();
     }
