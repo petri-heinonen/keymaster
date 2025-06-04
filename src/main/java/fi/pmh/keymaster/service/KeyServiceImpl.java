@@ -74,8 +74,8 @@ public class KeyServiceImpl implements KeyService {
             return "All keys for client [" + clientId + "] are already published.";
         }
 
-        List<String> published = new ArrayList<String>();
-        List<String> unpublished = new ArrayList<String>();
+        List<String> published = new ArrayList<>();
+        List<String> unpublished = new ArrayList<>();
 
         // Publish the two most recent keys and unpublish the rest
         for (Key key : allKeys) {

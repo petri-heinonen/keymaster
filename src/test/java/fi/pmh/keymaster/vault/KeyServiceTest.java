@@ -38,7 +38,7 @@ public class KeyServiceTest {
 
     @Test
     @Order(1)
-    public void testGenerateNewKey() throws Exception {
+    public void testGenerateNewKey() {
         jwksService.deleteKeysForClient(TEST_CLIENT_ID);
         jwksService.createKeysForClient(TEST_CLIENT_ID);
         List<Key> keys = keyService.getKeysByClientId(TEST_CLIENT_ID);
@@ -52,7 +52,7 @@ public class KeyServiceTest {
 
     @Test
     @Order(2)
-    public void testPublishKey() throws Exception {
+    public void testPublishKey() {
         jwksService.createKeysForClient(TEST_CLIENT_ID);
         List<Key> keys = keyService.getKeysByClientId(TEST_CLIENT_ID);
         for (Key key : keys) {

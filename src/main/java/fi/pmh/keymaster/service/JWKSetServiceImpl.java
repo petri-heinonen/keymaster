@@ -30,7 +30,7 @@ public class JWKSetServiceImpl implements JWKSetService {
 
         Key firstPublishedKey = publishedKeys.stream().filter(Key::isPublished).findFirst().orElse(null);
 
-        JWKSet jwkSet = null;
+        JWKSet jwkSet;
 
         if (firstPublishedKey != null) {
             Map<String, Object> properties = Map.of(
