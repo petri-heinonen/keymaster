@@ -73,18 +73,17 @@ public class PublicController {
     }
 
     @PostMapping("/generate")
-    public String generate(Model model, @RequestBody String body) {
+    public ResponseEntity<?> generate(@RequestBody String body) {
 
         // Parse value from request body: clientId=00.client.fi
         String[] parts = body.split("=");
         if (parts.length != 2 || !parts[0].equals("clientId")) {
-            model.addAttribute("error", "Invalid clientId format.");
-            return "error";
+            return ResponseEntity.badRequest().body("Invalid clientId format. Expected format: clientId=your-client-id");
         }
         String clientId = parts[1].trim();
         jwkSetService.createKeysForClient(clientId);
         keyService.publishMostRecentKeys(clientId);
 
-        return "redirect:/public/all-keys";
+        return ResponseEntity.ok("Keys generated and published for client: " + clientId);
     }
 }

@@ -42,7 +42,7 @@
 </table>
 
 <p>
-    <form th:action="@{/public/generate}" method="post">
+    <form id="generateClientForm">
         <label for="clientId">Generate new client with ID:</label>
         <input type="text" id="clientId" name="clientId" maxlength="40" required />
         <button type="submit">Generate</button>
@@ -64,6 +64,25 @@
 </table>
 
     <script>
+        document.getElementById('generateClientForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch('/public/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(formData).toString()
+            }).then(response => {
+                if (response.ok) {
+                    updateBodySection();
+                    form.reset();
+                }
+            });
+        });
+
         function updateCurrentTime() {
             const now = new Date();
             document.getElementById('currentTime').textContent = now.toLocaleTimeString('fi-FI', {
