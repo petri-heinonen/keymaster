@@ -40,7 +40,7 @@ public class PublicController {
     }
 
     @GetMapping("/all-keys")
-    public String getAllKeys(Model model) throws JsonProcessingException {
+    public String getAllKeys(Model model) {
         List<Client> clients = jwkSetService.getAllClientsWithKeys().stream().filter(Client::isPublished).collect(Collectors.toList());
         model.addAttribute("current", clients);
         List<Client> unpublished = jwkSetService.getAllClientsWithKeys().stream().filter(c -> !c.isPublished()).collect(Collectors.toList());
@@ -49,13 +49,13 @@ public class PublicController {
     }
 
     @GetMapping("/clients-and-keys")
-    public ResponseEntity<?> getAllKeys() throws JsonProcessingException {
+    public ResponseEntity<?> getAllKeys() {
         List<Client> publishedClients = jwkSetService.getAllClientsWithKeys().stream()
             .filter(Client::isPublished)
-            .collect(Collectors.toList());
+            .toList();
         List<Client> unpublishedClients = jwkSetService.getAllClientsWithKeys().stream()
             .filter(c -> !c.isPublished())
-            .collect(Collectors.toList());
+            .toList();
 
         // Create a response object
         var response = Map.of(
