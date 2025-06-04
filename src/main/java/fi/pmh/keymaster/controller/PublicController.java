@@ -8,6 +8,7 @@ import fi.pmh.keymaster.domain.Client;
 import fi.pmh.keymaster.service.JWKSetService;
 import fi.pmh.keymaster.service.KeyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,15 @@ public class PublicController {
     @Autowired
     private KeyService keyService;
 
+    @Value("${settings.vault.key.lifetime}")
+    private long keyLifetime;
+
+    @Value("${settings.vault.key.create-before}")
+    private long createBefore;
+
+    @Value("${settings.vault.key.rotate-before}")
+    private long rotateBefore;
+
     @GetMapping("/signed-jwks/{clientId}")
     public ResponseEntity<String> getSignedJwks(@PathVariable String clientId, @RequestParam(required = false) boolean all) throws JsonProcessingException {
         JWKSet set = jwkSetService.generateJwksSetFor(clientId, all);
@@ -41,6 +51,9 @@ public class PublicController {
 
     @GetMapping("/all-keys")
     public String getAllKeys(Model model) {
+        model.addAttribute("configs", "Key lifetime: " + keyLifetime + " seconds<br>" +
+            "Create before expiration: " + createBefore + " seconds<br>" +
+            "Rotate before expiration: " + rotateBefore + " seconds");
         List<Client> clients = jwkSetService.getAllClientsWithKeys().stream().filter(Client::isPublished).collect(Collectors.toList());
         model.addAttribute("current", clients);
         List<Client> unpublished = jwkSetService.getAllClientsWithKeys().stream().filter(c -> !c.isPublished()).collect(Collectors.toList());

@@ -17,16 +17,33 @@
         .red-row {
             background-color: lightsalmon;
         }
+        .green-text {
+            color: green;
+        }
     </style>
 </head>
 <body>
+
+<h1>Rotation config</h1>
+<p><span th:utext="${configs}"></span></p>
+
+<form id="generateClientForm">
+    <label for="clientId">Generate new client with ID:</label>&nbsp;
+    <input type="text" id="clientId" name="clientId" maxlength="40" required />
+    <button type="submit">Generate</button>
+</form>
+
 <p>
+
     <button id="clearKeysButton" onclick="clearAllKeys()">Reset</button>
     <button id="togglePollingButton" onclick="togglePolling()">Stop Polling</button>
 </p>
 
+<p>
+    <b>Current time: <span class="green-text" id="currentTime"></span></b>
+</p>
+
 <h1>Published keys</h1>
-<p>Current time: <span id="currentTime"></span></p>
 <table>
     <thead>
     <tr>
@@ -40,13 +57,6 @@
     </thead>
     <tbody id="publishedKeys"></tbody>
 </table>
-
-<p>
-    <form id="generateClientForm">
-        <label for="clientId">Generate new client with ID:</label>
-        <input type="text" id="clientId" name="clientId" maxlength="40" required />
-        <button type="submit">Generate</button>
-    </form>
 
 <h1>Unpublished keys</h1>
 <table>
