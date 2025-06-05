@@ -51,7 +51,7 @@ public class PublicController {
     }
 
     @GetMapping("/signed-jwks/all-clients")
-    public ResponseEntity<?> getSignedJwksForAllClients() throws JsonProcessingException {
+    public ResponseEntity<?> getSignedJwksForAllClients() {
         List<String> clientIds = keyService.getClientIds();
 
         ObjectMapper objectMapper = ObjectMapperConfig.createObjectMapper();
