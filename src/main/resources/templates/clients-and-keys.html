@@ -20,6 +20,12 @@
         .green-text {
             color: green;
         }
+        pre {
+            font-size: 7pt;
+            max-width: 172ch;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -34,7 +40,6 @@
 </form>
 
 <p>
-
     <button id="clearKeysButton" onclick="clearAllKeys()">Reset</button>
     <button id="togglePollingButton" onclick="togglePolling()">Stop Polling</button>
 </p>
@@ -73,7 +78,25 @@
     <tbody id="unpublishedKeys"></tbody>
 </table>
 
+<h1>Signed JWKS</h1>
+<p id="jwks"></p>
+
     <script>
+        let polling = true;
+        let pollingInterval;
+
+        function togglePolling() {
+            polling = !polling;
+            const button = document.getElementById('togglePollingButton');
+            if (polling) {
+                button.textContent = 'Stop Polling';
+                pollingInterval = setInterval(updateBodySection, 1000);
+            } else {
+                button.textContent = 'Start Polling';
+                clearInterval(pollingInterval);
+            }
+        }
+
         document.getElementById('generateClientForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const form = event.target;
@@ -93,6 +116,10 @@
             });
         });
 
+        function clearAllKeys() {
+            fetch('/public/clear-keys', { method: 'POST' });
+        }
+
         function updateCurrentTime() {
             const now = new Date();
             document.getElementById('currentTime').textContent = now.toLocaleTimeString('fi-FI', {
@@ -101,8 +128,6 @@
                 second: '2-digit'
             });
         }
-
-        setInterval(updateCurrentTime, 1000);
 
         function updateBodySection() {
             fetch('/public/clients-and-keys')
@@ -147,30 +172,44 @@
                     });
                 });
         }
-        let polling = true;
-        let pollingInterval;
 
-        function clearAllKeys() {
-            fetch('/public/clear-keys', { method: 'POST' });
+        function copyToClipboard(preElement) {
+            const text = preElement.textContent;
+            navigator.clipboard.writeText(text);
         }
 
-        function togglePolling() {
-            polling = !polling;
-            const button = document.getElementById('togglePollingButton');
-            if (polling) {
-                button.textContent = 'Stop Polling';
-                pollingInterval = setInterval(updateBodySection, 1000);
-            } else {
-                button.textContent = 'Start Polling';
-                clearInterval(pollingInterval);
-            }
+        function updateJwksSets() {
+            fetch('/public/signed-jwks/all-clients')
+                .then(response => response.json())
+                .then(data => {
+                    const jwksContainer = document.getElementById('jwks');
+                    jwksContainer.innerHTML = ''; // Clear previous content
+
+                    Object.entries(data).forEach(([clientId, jwksSet]) => {
+                        const preElement = document.createElement('pre');
+                        const formattedText = jwksSet.replace(/-/g, '&#8209;'); // Replace "-" with non-breaking hyphen
+                        preElement.innerHTML = formattedText; // Use innerHTML for formatted text
+
+                        const copyButton = document.createElement('button');
+                        copyButton.textContent = 'Copy';
+                        copyButton.onclick = () => copyToClipboard(preElement);
+
+                        jwksContainer.appendChild(preElement);
+                        jwksContainer.appendChild(copyButton);
+                    });
+                });
         }
+
+        setInterval(updateCurrentTime, 1000);
 
         // Start polling by default
         pollingInterval = setInterval(updateBodySection, 1000);
 
         // Call updateBodySection immediately after the page loads
         updateBodySection();
+
+        // Call updateJwksSets immediately after the page loads
+        setInterval(updateJwksSets, 1000);
     </script>
 </body>
 </html>

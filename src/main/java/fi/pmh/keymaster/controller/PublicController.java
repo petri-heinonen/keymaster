@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +48,29 @@ public class PublicController {
         ObjectMapper objectMapper = ObjectMapperConfig.createObjectMapper();
         String jwksSet = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set);
         return ResponseEntity.ok(jwksSet);
+    }
+
+    @GetMapping("/signed-jwks/all-clients")
+    public ResponseEntity<?> getSignedJwksForAllClients() throws JsonProcessingException {
+        List<String> clientIds = keyService.getClientIds();
+
+        ObjectMapper objectMapper = ObjectMapperConfig.createObjectMapper();
+        Map<String, String> jwksSets = clientIds.stream()
+            .collect(Collectors.toMap(
+                clientId -> clientId,
+                clientId -> {
+                    try {
+                        JWKSet set = jwkSetService.generateJwksSetFor(clientId, false);
+                        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set);
+                    } catch (JsonProcessingException e) {
+                        return "Error generating JWKS for client: " + clientId;
+                    }
+                },
+                (existing, replacement) -> existing,
+                LinkedHashMap::new
+            ));
+
+        return ResponseEntity.ok(jwksSets);
     }
 
     @GetMapping("/all-keys")
