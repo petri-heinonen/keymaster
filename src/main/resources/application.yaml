@@ -4,7 +4,7 @@ spring:
   profiles:
     active: dev
   jackson:
-    time-zone: 'UTC'
+    time-zone: 'Europe/Helsinki'
     date-format: "yyyyMMdd'T'HHmmssX"
 server:
   port: 8100
